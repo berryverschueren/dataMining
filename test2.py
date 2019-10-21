@@ -100,8 +100,11 @@ def train_network(network, train, l_rate, n_epoch, n_outputs):
             expected = [0 for i in range(n_outputs)]
             expected[row[-1]] = 1
             sum_error += sum([(expected[i] - outputs[i]) ** 2 for i in range(len(expected))])
+
             backward_propagate_error(network, expected)
+
             update_weights(network, row, l_rate)
+
         print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
 
 
