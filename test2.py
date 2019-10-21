@@ -15,7 +15,6 @@ def load_csv(filename):
             dataset.append(row)
     return dataset
 
-#testing colab yeah!
 
 # Initialize a network
 def initialize_network(n_inputs, n_hidden, n_outputs):
