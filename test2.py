@@ -1,7 +1,11 @@
 from random import seed
+from random import randrange
 from random import random
 from csv import reader
 from math import exp, tanh
+import numpy as np
+import time
+import matplotlib.pyplot as plt
 
 
 # Load a CSV file
@@ -93,20 +97,27 @@ def update_weights(network, row, l_rate):
 
 # Train a network for a fixed number of epochs
 def train_network(network, train, l_rate, n_epoch, n_outputs):
+    goodResultCount = 0
     for epoch in range(n_epoch):
         sum_error = 0
-        for row in train:
+        for m in range(80):
+            randomindex = randrange(len(train))
+            row = train[randomindex]
             outputs = forward_propagate(network, row)
             expected = [0 for i in range(n_outputs)]
             expected[row[-1]] = 1
             sum_error += sum([(expected[i] - outputs[i]) ** 2 for i in range(len(expected))])
-
             backward_propagate_error(network, expected)
-
             update_weights(network, row, l_rate)
 
         print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
+        errorForPlot.append(sum_error)
 
+        if sum_error < 1:
+            goodResultCount += 1
+
+        if goodResultCount > 2:
+            break
 
 # Convert string column to float
 def str_column_to_float(dataset, column):
@@ -143,6 +154,9 @@ def normalize_dataset(dataset, minmax):
             row[i] = (row[i] - minmax[i][0]) / (minmax[i][1] - minmax[i][0])
 
 
+errorForPlot = list()
+firsttime = time.time()
+
 # berry
 filename = 'HW3Atrain.csv'
 dataset = load_csv(filename)
@@ -158,13 +172,13 @@ minmax = dataset_minmax(dataset)
 normalize_dataset(dataset, minmax)
 
 # Test training backprop algorithm
-seed(1)
+# seed(1)
 
 n_inputs = len(dataset[0]) - 1
 n_outputs = len(set([row[-1] for row in dataset]))
 print(n_inputs, n_outputs)
 network = initialize_network(n_inputs, 10, n_outputs)
-train_network(network, dataset, 0.3, 500, n_outputs)
+train_network(network, dataset, 0.5, 2000, n_outputs)
 for layer in network:
     print(layer)
 
@@ -197,7 +211,7 @@ numberOfWrongAnswers = 0
 
 for row in dataset:
     prediction = predict(network, row)
-    if (row[-1] == prediction):
+    if row[-1] == prediction:
         numberOfCorrectAnswers += 1
     else:
         numberOfWrongAnswers += 1
@@ -206,3 +220,15 @@ for row in dataset:
 print('Correct: %d' % numberOfCorrectAnswers)
 print('Wrong: %d' % numberOfWrongAnswers)
 print('Total: %d' % len(dataset))
+
+secondtime = time.time()
+
+print(secondtime - firsttime)
+
+iterationCount = len(errorForPlot)
+
+plt.figure()
+plt.plot(range(iterationCount), errorForPlot, "r-")
+plt.xlabel("Iteration count")
+plt.ylabel("Total error")
+plt.show()
