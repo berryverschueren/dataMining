@@ -111,7 +111,7 @@ def train_network(network, train, l_rate, n_epoch, n_outputs):
             update_weights(network, row, l_rate)
 
         print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
-        errorForPlot.append(sum_error)
+        errorForPlotTraining.append(sum_error)
 
         if sum_error < 1:
             goodResultCount += 1
@@ -154,11 +154,12 @@ def normalize_dataset(dataset, minmax):
             row[i] = (row[i] - minmax[i][0]) / (minmax[i][1] - minmax[i][0])
 
 
-errorForPlot = list()
+errorForPlotTraining = list()
 firsttime = time.time()
 
 # berry
-filename = 'HW3Atrain.csv'
+# filename = 'HW3Atrain.csv'
+filename = 'HW3Avalidate.csv'
 dataset = load_csv(filename)
 dataset.pop(0)
 
@@ -192,7 +193,8 @@ def predict(network, row):
 
 
 # berry
-filename = 'HW3Avalidate.csv'
+# filename = 'HW3Avalidate.csv'
+filename = 'HW3Atrain.csv'
 dataset = load_csv(filename)
 dataset.pop(0)
 
@@ -208,12 +210,24 @@ normalize_dataset(dataset, minmax)
 
 numberOfCorrectAnswers = 0
 numberOfWrongAnswers = 0
+predicted0ShouldBe1 = 0
+predicted1ShouldBe0 = 0
+predicted1ShouldBe1 = 0
+predicted0ShouldBe0 = 0
 
 for row in dataset:
     prediction = predict(network, row)
     if row[-1] == prediction:
+        if row[-1] == 0:
+            predicted0ShouldBe0 += 1
+        else:
+            predicted1ShouldBe1 += 1
         numberOfCorrectAnswers += 1
     else:
+        if row[-1] == 0:
+            predicted1ShouldBe0 += 1
+        else:
+            predicted0ShouldBe1 += 1
         numberOfWrongAnswers += 1
     # print('Expected=%d, Got=%d' % (row[-1], prediction))
 
@@ -221,14 +235,19 @@ print('Correct: %d' % numberOfCorrectAnswers)
 print('Wrong: %d' % numberOfWrongAnswers)
 print('Total: %d' % len(dataset))
 
+print('predicted 1, should be 1', predicted1ShouldBe1)
+print('predicted 0, should be 0', predicted0ShouldBe0)
+print('predicted 1, should be 0', predicted1ShouldBe0)
+print('predicted 0, should be 1', predicted0ShouldBe1)
+
 secondtime = time.time()
 
 print(secondtime - firsttime)
 
-iterationCount = len(errorForPlot)
+iterationCount = len(errorForPlotTraining)
 
 plt.figure()
-plt.plot(range(iterationCount), errorForPlot, "r-")
+plt.plot(range(iterationCount), errorForPlotTraining, "r-")
 plt.xlabel("Iteration count")
 plt.ylabel("Total error")
 plt.show()
