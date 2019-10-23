@@ -158,8 +158,8 @@ errorForPlotTraining = list()
 firsttime = time.time()
 
 # berry
-# filename = 'HW3Atrain.csv'
-filename = 'HW3Avalidate.csv'
+filename = 'HW3Atrain.csv'
+# filename = 'HW3Avalidate.csv'
 dataset = load_csv(filename)
 dataset.pop(0)
 
@@ -193,8 +193,8 @@ def predict(network, row):
 
 
 # berry
-# filename = 'HW3Avalidate.csv'
-filename = 'HW3Atrain.csv'
+filename = 'HW3Avalidate.csv'
+# filename = 'HW3Atrain.csv'
 dataset = load_csv(filename)
 dataset.pop(0)
 
